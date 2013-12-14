@@ -1,28 +1,28 @@
 var irysius = irysius || {};
 
-irysius.cordovaCanvas = {
+irysius.createJsCanvas = {
     initialized: false,
     stage: null,
     canvas: null,
     container: null,
     preload: null,
+    _width: 0,
+    _height: 0,
     width: function () {
-        var self = this;
-        if (!self.canvas) return 0;
-        return $(self.canvas).width();
+        var self = irysius.createJsCanvas;
+        return self._width;
     },
     height: function () {
-        var self = this;
-        if (!self.canvas) return 0;
-        return $(self.canvas).height();
+        var self = irysius.createJsCanvas;
+        return self._height;
     },
     find: function (name) {
-        var self = this;
+        var self = irysius.createJsCanvas;
         if (!self.stage) return null;
         return self.stage.getChildByName(name);
     },
     init: function (canvasId) {
-        var self = this;
+        var self = irysius.createJsCanvas;
         self.canvas = document.getElementById(canvasId);
         self.container = $(self.canvas).parent();
         $(window).resize(function () {
@@ -37,59 +37,59 @@ irysius.cordovaCanvas = {
     },
     prepareAssets: function (context) { },
     _prepareAssets: function () {
-        var self = irysius.cordovaCanvas;
+        var self = irysius.createJsCanvas;
         console.log('preparing assets');
         self.prepareAssets(self);
-        self._run();
+        self.run();
         self._resizing();
     },
     resizing: function (width, height) { },
     _resizing: function () {
-        var self = irysius.cordovaCanvas;
+        var self = irysius.createJsCanvas;
         var width = $(self.container).width();
         var height = $(self.container).height();
         self.canvas.width = width;
         self.canvas.height = height;
+        self._width = width;
+        self._height = height;
         console.log('resizing to: ' + width + 'x' + height);
 
         self.resizing(width, height);
     },
-    run: function () { },
-    _run: function () {
-        var self = irysius.cordovaCanvas;
-        console.log('stage running.')
-        self.run();
-        createjs.Ticker.setInterval(30);
+    run: function () {
+        var self = irysius.createJsCanvas;
+        console.log('stage running.');
+        createjs.Ticker.setInterval(1000 / self._vars.fps.target);
         createjs.Ticker.addEventListener('tick', self._tick);
     },
     _tick: function () {
-        var self = irysius.cordovaCanvas;
+        var self = irysius.createJsCanvas;
         self._update();
         self._draw();
     },
     _vars: {
         prevTime: 0,
         fps: {
-            target: 30,
+            target: 30, // Good target for mobile.
             curr: 0,
             max: 0,
-            min: 100,
+            min: 1000,
             track: false
         }
     },
     update: function (context, elapsedTime) { },
     _update: function () {
-        var self = irysius.cordovaCanvas;
+        var self = irysius.createJsCanvas;
         var totalTime = createjs.Ticker.getTime();
         var elapsedTime = totalTime - self._vars.prevTime;
         self._vars.prevTime = totalTime;
 
         self._vars.fps.curr = Math.round(10000 / elapsedTime) / 10;
         if (!self._vars.fps.track) {
-            if (self._vars.fps.curr > self._vars.fps.target * 0.90) { 
+            if (self._vars.fps.curr > self._vars.fps.target * 0.90) {
                 setTimeout(function () {
-                    self._vars.fps.track = true; 
-                }, 5000)
+                    self._vars.fps.track = true;
+                }, 4000)
             }
         } else {
             if (self._vars.fps.curr > self._vars.fps.max) self._vars.fps.max = self._vars.fps.curr;
@@ -99,8 +99,16 @@ irysius.cordovaCanvas = {
     },
     draw: function () { },
     _draw: function () {
-        var self = irysius.cordovaCanvas;
+        var self = irysius.createJsCanvas;
         self.draw();
         self.stage.update();
+    },
+    stop: function () {
+        var self = irysius.createJsCanvas;
+        console.log('stage stopped.');
+        createjs.Ticker.removeEventListener('tick', self._tick);
+        self._vars.fps.track = false;
+        self._vars.fps.max = 0;
+        self._vars.fps.min = 1000;
     }
 }

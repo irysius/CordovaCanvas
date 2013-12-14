@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <title>CreateJs Context</title>
+        <link rel="stylesheet" type="text/css" href="css/site.css">
+        <script src="js/lib/createjs-2013.09.25.min.js"></script>
+        <script src="js/lib/jquery-1.10.2.min.js"></script>
+        <script src="js/createjs-canvas.js"></script>
+    </head>
+    <body>
+        <canvas id="main-canvas"></canvas>
+        <script>
+            var circles = [];
+            function randomizeColor() {
+                var letters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+                var color = '#';
+                var counter = 0;
+                while (counter < 6) {
+                    var idx = randomizeRange(0, 15);
+                    color += letters[idx];
+                    counter++;
+                }
+                return color;
+            }
+            function randomizeRange(min, max) {
+                var range = max - min;
+                return min + Math.round(Math.random() * range);
+            }
+            $(function () {
+                irysius.createJsCanvas.prepareAssets = function (context) {
+                    var index = 0;
+                    // Target FPS: 50
+                    // 100 circles - iOS good, WP8 12 fps, Android 8 fps
+                    // 50 circles - iOS ??, WP8 22 fps, Android ??
+                    // 25 circles - iOS ??, WP8 40 fps, Android 10 fps
+                    while (index < 50) {
+                        var circle = new createjs.Shape();
+                        // Randomize color
+                        var color = randomizeColor();
+                        var radius = randomizeRange(15, 45);
+                        circle.graphics.beginFill(color).drawCircle(radius, radius, radius);
+                        circle.regX = radius;
+                        circle.regY = radius;
+                        circle.radius = radius;
+
+                        // Randomize starting position: between 50 and width - 50
+                        circle.x = 50 + randomizeRange(0, context.width() - 100);
+                        circle.y = 50 + randomizeRange(0, context.height() - 100);
+
+                        // Randomize velocity
+                        circle.dx = randomizeRange(-15, 15);
+                        circle.dy = randomizeRange(-15, 15);
+
+                        // does nothing for the performance on wp8 and android.
+                        circle.cache(-circle.radius, -circle.radius, circle.radius * 4, circle.radius * 4);
+                        context.stage.addChild(circle);
+
+                        circles.push(circle);
+                        index += 1;
+                    }
+                    var fontStyle = '24px Arial';
+                    var fontColor = '#458B00';
+                    var fpsCurr = new createjs.Text('FPS: 0', fontStyle, fontColor);
+                    fpsCurr.x = 5;
+                    fpsCurr.y = 5;
+                    fpsCurr.name = 'fpsCurr';
+                    var fpsMin = new createjs.Text('MIN: N/A', fontStyle, fontColor);
+                    fpsMin.x = 5;
+                    fpsMin.y = 10 + fpsCurr.getMeasuredHeight();
+                    fpsMin.name = 'fpsMin';
+                    var fpsMax = new createjs.Text('MAX: N/A', fontStyle, fontColor);
+                    fpsMax.x = 5;
+                    fpsMax.y = 15 + fpsCurr.getMeasuredHeight() * 2;
+                    fpsMax.name = 'fpsMax';
+                    context.stage.addChild(fpsCurr);
+                    context.stage.addChild(fpsMin);
+                    context.stage.addChild(fpsMax);
+                }
+
+                irysius.createJsCanvas.update = function (context, elapsedTime) {
+                    for (idx in circles) {
+                        circles[idx].x += circles[idx].dx;
+                        circles[idx].y += circles[idx].dy;
+                        if (circles[idx].x < circles[idx].radius) { circles[idx].x = circles[idx].radius; circles[idx].dx *= -1 };
+                        if (circles[idx].y < circles[idx].radius) { circles[idx].y = circles[idx].radius; circles[idx].dy *= -1; }
+                        if (circles[idx].x > context.width() - circles[idx].radius) {
+                            circles[idx].x = context.width() - circles[idx].radius;
+                            circles[idx].dx *= -1;
+                        }
+                        if (circles[idx].y > context.height() - circles[idx].radius) {
+                            circles[idx].y = context.height() - circles[idx].radius;
+                            circles[idx].dy *= -1;
+                        }
+                    }
+                    var fpsCurr = context.find('fpsCurr');
+                    fpsCurr.text = 'FPS: ' + context._vars.fps.curr;
+                    var fpsMin = context.find('fpsMin');
+                    var fpsMax = context.find('fpsMax');
+
+                    if (context._vars.fps.track) {
+                        fpsMin.text = 'MIN: ' + context._vars.fps.min;
+                        fpsMax.text = 'MAX: ' + context._vars.fps.max;
+                    } else {
+                        fpsMin.text = 'MIN: N/A';
+                        fpsMax.text = 'MAX: N/A';
+                    }
+                }
+
+                irysius.createJsCanvas.init('main-canvas');
+
+            })
+        </script>
+    </body>
+</html>
