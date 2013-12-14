@@ -3,9 +3,118 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title></title>
+        <meta name="format-detection" content="telephone=no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <title>CreateJs Sprite</title>
+        <link rel="stylesheet" type="text/css" href="css/site.css">
+        <script src="js/lib/createjs-2013.09.25.min.js"></script>
+        <script src="js/lib/jquery-1.10.2.min.js"></script>
+        <script src="js/createjs-canvas.js"></script>
     </head>
     <body>
-        
+        <canvas id="main-canvas"></canvas>
+        <script>
+            function randomizeRange(min, max) {
+                var range = max - min;
+                return min + Math.round(Math.random() * range);
+            }
+
+            $(function () {
+                irysius.createJsCanvas.manifest.push({ id: 'palette', src: 'img/palette.png' });
+
+                irysius.createJsCanvas.prepareAssets = function (context) {
+                    context.vars.shapes = [];
+                    context.vars.fps = {
+                        curr: null,
+                        max: null,
+                        min: null
+                    };
+
+                    var palette = context.preload.getResult('palette');
+                    var i = 0;
+                    for (; i < 100; i++) {
+                        var y = i % 10;
+                        var x = (i / 10) >> 0;
+                        var shape = new createjs.Bitmap(palette);
+                        shape.width = 40;
+                        shape.height = 40;
+                        shape.sourceRect = new createjs.Rectangle(x * 40, y * 40, 40, 40);
+                        console.log(shape.sourceRect);
+
+                        shape.x = context.width() / 2;
+                        shape.y = context.height() / 2;
+
+                        // Randomize velocity
+                        shape.dx = randomizeRange(-400, 400);
+                        if (shape.dx >= 0) shape.dx += 50
+                        else shape.dx -= 50;
+                        shape.dy = randomizeRange(-400, 400);
+                        if (shape.dy >= 0) shape.dy += 50;
+                        else shape.dy -= 50;
+
+                        context.stage.addChild(shape);
+                        context.vars.shapes.push(shape);
+                    }
+
+                    console.log(context.vars.shapes.length);
+
+                    var fontStyle = '24px Arial';
+                    var fontColor = '#458B00';
+                    var fpsCurr = new createjs.Text('FPS: 0', fontStyle, fontColor);
+                    fpsCurr.x = 5;
+                    fpsCurr.y = 5;
+                    fpsCurr.name = 'fpsCurr';
+                    var fpsMin = new createjs.Text('MIN: N/A', fontStyle, fontColor);
+                    fpsMin.x = 5;
+                    fpsMin.y = 10 + fpsCurr.getMeasuredHeight();
+                    fpsMin.name = 'fpsMin';
+                    var fpsMax = new createjs.Text('MAX: N/A', fontStyle, fontColor);
+                    fpsMax.x = 5;
+                    fpsMax.y = 15 + fpsCurr.getMeasuredHeight() * 2;
+                    fpsMax.name = 'fpsMax';
+                    context.stage.addChild(fpsCurr);
+                    context.stage.addChild(fpsMin);
+                    context.stage.addChild(fpsMax);
+                    context.vars.fps.curr = fpsCurr;
+                    context.vars.fps.max = fpsMax;
+                    context.vars.fps.min = fpsMin;
+                }
+                irysius.createJsCanvas.update = function (context, elapsedTime) {
+                    for (idx in context.vars.shapes) {
+                        var shape = context.vars.shapes[idx];
+                        shape.x += shape.dx / 1000 * elapsedTime;
+                        shape.y += shape.dy / 1000 * elapsedTime;
+                        if (shape.x < 0) {
+                            shape.x = 1;
+                            if (shape.dx < 0) shape.dx *= -1;
+                        }
+                        if (shape.y < 0) {
+                            shape.y = 1;
+                            if (shape.dy < 0) shape.dy *= -1;
+                        }
+                        if (shape.x + shape.width > context.width()) {
+                            shape.x = context.width() - shape.width - 1;
+                            if (shape.dx > 0) shape.dx *= -1;
+                        }
+                        if (shape.y + shape.height > context.height()) {
+                            shape.y = context.height() - shape.height - 1;
+                            if (shape.dy > 0) shape.dy *= -1;
+                        }
+
+                        var fps = context.vars.fps;
+                        fps.curr.text = 'FPS: ' + context._vars.fps.curr;
+                        if (context._vars.fps.track) {
+                            fps.min.text = 'MIN: ' + context._vars.fps.min;
+                            fps.max.text = 'MAX: ' + context._vars.fps.max;
+                        } else {
+                            fps.min.text = 'MIN: N/A';
+                            fps.max.text = 'MAX: N/A';
+                        }
+                    }
+                }
+                irysius.createJsCanvas.init('main-canvas');
+            })
+        </script>
     </body>
 </html>

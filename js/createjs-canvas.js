@@ -6,6 +6,7 @@ irysius.createJsCanvas = {
     canvas: null,
     container: null,
     preload: null,
+    manifest: [],
     _width: 0,
     _height: 0,
     width: function () {
@@ -32,6 +33,11 @@ irysius.createJsCanvas = {
         self.stage = new createjs.Stage(self.canvas);
         self.preload = new createjs.LoadQueue(true);
         self.preload.addEventListener('complete', self._prepareAssets);
+
+        if (self.manifest && self.manifest.length > 0) {
+            self.preload.loadManifest(self.manifest, false);
+        }
+
         self.preload.load();
         self.initialized = true;
     },
@@ -39,9 +45,9 @@ irysius.createJsCanvas = {
     _prepareAssets: function () {
         var self = irysius.createJsCanvas;
         console.log('preparing assets');
+        self._resizing();
         self.prepareAssets(self);
         self.run();
-        self._resizing();
     },
     resizing: function (width, height) { },
     _resizing: function () {
@@ -70,13 +76,14 @@ irysius.createJsCanvas = {
     _vars: {
         prevTime: 0,
         fps: {
-            target: 30, // Good target for mobile.
+            target: 60, // Good target for mobile.
             curr: 0,
             max: 0,
             min: 1000,
             track: false
         }
     },
+    vars: {},
     update: function (context, elapsedTime) { },
     _update: function () {
         var self = irysius.createJsCanvas;
@@ -89,7 +96,7 @@ irysius.createJsCanvas = {
             if (self._vars.fps.curr > self._vars.fps.target * 0.90) {
                 setTimeout(function () {
                     self._vars.fps.track = true;
-                }, 4000)
+                }, 5000)
             }
         } else {
             if (self._vars.fps.curr > self._vars.fps.max) self._vars.fps.max = self._vars.fps.curr;
