@@ -38,23 +38,26 @@
                     // 100 circles - iOS good, WP8 12 fps, Android 8 fps
                     // 50 circles - iOS ??, WP8 22 fps, Android ??
                     // 25 circles - iOS ??, WP8 40 fps, Android 10 fps
-                    while (index < 50) {
+                    while (index < 100) {
                         var circle = new createjs.Shape();
                         // Randomize color
                         var color = randomizeColor();
                         var radius = randomizeRange(15, 45);
                         circle.graphics.beginFill(color).drawCircle(radius, radius, radius);
-                        circle.regX = radius;
-                        circle.regY = radius;
                         circle.radius = radius;
+                        circle.width = radius * 2;
+                        circle.height = radius * 2;
 
-                        // Randomize starting position: between 50 and width - 50
-                        circle.x = 50 + randomizeRange(0, context.width() - 100);
-                        circle.y = 50 + randomizeRange(0, context.height() - 100);
+                        circle.x = context.width() / 2;
+                        circle.y = context.height() / 2;
 
                         // Randomize velocity
-                        circle.dx = randomizeRange(-15, 15);
-                        circle.dy = randomizeRange(-15, 15);
+                        circle.dx = randomizeRange(-400, 400);
+                        if (circle.dx >= 0) circle.dx += 50
+                        else circle.dx -= 50;
+                        circle.dy = randomizeRange(-400, 400);
+                        if (circle.dy >= 0) circle.dy += 50;
+                        else circle.dy -= 50;
 
                         // does nothing for the performance on wp8 and android.
                         circle.cache(-circle.radius, -circle.radius, circle.radius * 4, circle.radius * 4);
@@ -84,17 +87,24 @@
 
                 irysius.createJsCanvas.update = function (context, elapsedTime) {
                     for (idx in circles) {
-                        circles[idx].x += circles[idx].dx;
-                        circles[idx].y += circles[idx].dy;
-                        if (circles[idx].x < circles[idx].radius) { circles[idx].x = circles[idx].radius; circles[idx].dx *= -1 };
-                        if (circles[idx].y < circles[idx].radius) { circles[idx].y = circles[idx].radius; circles[idx].dy *= -1; }
-                        if (circles[idx].x > context.width() - circles[idx].radius) {
-                            circles[idx].x = context.width() - circles[idx].radius;
-                            circles[idx].dx *= -1;
+                        var shape = circles[idx];
+                        shape.x += shape.dx / 1000 * elapsedTime;
+                        shape.y += shape.dy / 1000 * elapsedTime;
+                        if (shape.x < 0) {
+                            shape.x = 1;
+                            if (shape.dx < 0) shape.dx *= -1
+                        };
+                        if (shape.y < 0) {
+                            shape.y = 1;
+                            if (shape.dy < 0) shape.dy *= -1;
                         }
-                        if (circles[idx].y > context.height() - circles[idx].radius) {
-                            circles[idx].y = context.height() - circles[idx].radius;
-                            circles[idx].dy *= -1;
+                        if (shape.x + shape.width > context.width()) {
+                            shape.x = context.width() - shape.width - 1;
+                            shape.dx *= -1;
+                        }
+                        if (shape.y + shape.height > context.height()) {
+                            shape.y = context.height() - shape.height - 1;
+                            shape.dy *= -1;
                         }
                     }
                     var fpsCurr = context.find('fpsCurr');

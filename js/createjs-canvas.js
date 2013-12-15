@@ -76,7 +76,7 @@ irysius.createJsCanvas = {
     _vars: {
         prevTime: 0,
         fps: {
-            target: 60, // Good target for mobile.
+            target: 40, // Good target for mobile.
             curr: 0,
             max: 0,
             min: 1000,
