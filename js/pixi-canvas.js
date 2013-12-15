@@ -18,6 +18,7 @@ irysius.pixiCanvas = {
     init: function ($container) {
         var self = irysius.pixiCanvas;
         self.stage = new PIXI.Stage(0xFFFFFF);
+        // You can also use PIXI.WebGLRenderer or PIXI.CanvasRenderer
         self.canvas = PIXI.autoDetectRenderer(800, 600);
         $container.append(self.canvas.view);
         self.container = $container;
@@ -28,7 +29,7 @@ irysius.pixiCanvas = {
         self._prepareAssets();
         self.run();
         self.initialized = true;
-        requestAnimFrame(self._tick);
+        requestAnimationFrame(self._tick);
     },
     prepareAssets: function (context) { },
     _prepareAssets: function () {
@@ -56,7 +57,7 @@ irysius.pixiCanvas = {
     },
     _tick: function () {
         var self = irysius.pixiCanvas;
-        requestAnimFrame(self._tick)
+        requestAnimationFrame(self._tick)
 
         if (self._vars.isPaused) return;
         self._update();
