@@ -15,7 +15,6 @@
     <body>
         <canvas id="main-canvas"></canvas>
         <script>
-            var circles = [];
             function randomizeColor() {
                 var letters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
                 var color = '#';
@@ -33,6 +32,12 @@
             }
             $(function () {
                 irysius.createJsCanvas.prepareAssets = function (context) {
+                    context.vars.shapes = [];
+                    context.vars.fps = {
+                        curr: null,
+                        max: null,
+                        min: null
+                    };
                     var index = 0;
                     // Target FPS: 50
                     // 100 circles - iOS good, WP8 12 fps, Android 8 fps
@@ -62,8 +67,7 @@
                         // does nothing for the performance on wp8 and android.
                         circle.cache(-circle.radius, -circle.radius, circle.radius * 4, circle.radius * 4);
                         context.stage.addChild(circle);
-
-                        circles.push(circle);
+                        context.vars.shapes.push(circle);
                         index += 1;
                     }
                     var fontStyle = '24px Arial';
@@ -83,11 +87,14 @@
                     context.stage.addChild(fpsCurr);
                     context.stage.addChild(fpsMin);
                     context.stage.addChild(fpsMax);
+                    context.vars.fps.curr = fpsCurr;
+                    context.vars.fps.max = fpsMax;
+                    context.vars.fps.min = fpsMin;
                 }
 
                 irysius.createJsCanvas.update = function (context, elapsedTime) {
-                    for (idx in circles) {
-                        var shape = circles[idx];
+                    for (idx in context.vars.shapes) {
+                        var shape = context.vars.shapes[idx];
                         shape.x += shape.dx / 1000 * elapsedTime;
                         shape.y += shape.dy / 1000 * elapsedTime;
                         if (shape.x < 0) {
@@ -107,22 +114,19 @@
                             shape.dy *= -1;
                         }
                     }
-                    var fpsCurr = context.find('fpsCurr');
-                    fpsCurr.text = 'FPS: ' + context._vars.fps.curr;
-                    var fpsMin = context.find('fpsMin');
-                    var fpsMax = context.find('fpsMax');
 
+                    var fps = context.vars.fps;
+                    fps.curr.text = 'FPS: ' + context._vars.fps.curr;
                     if (context._vars.fps.track) {
-                        fpsMin.text = 'MIN: ' + context._vars.fps.min;
-                        fpsMax.text = 'MAX: ' + context._vars.fps.max;
+                        fps.min.text = 'MIN: ' + context._vars.fps.min;
+                        fps.max.text = 'MAX: ' + context._vars.fps.max;
                     } else {
-                        fpsMin.text = 'MIN: N/A';
-                        fpsMax.text = 'MAX: N/A';
+                        fps.min.text = 'MIN: N/A';
+                        fps.max.text = 'MAX: N/A';
                     }
                 }
 
                 irysius.createJsCanvas.init('main-canvas');
-
             })
         </script>
     </body>

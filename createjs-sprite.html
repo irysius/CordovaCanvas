@@ -40,7 +40,6 @@
                         shape.width = 40;
                         shape.height = 40;
                         shape.sourceRect = new createjs.Rectangle(x * 40, y * 40, 40, 40);
-                        console.log(shape.sourceRect);
 
                         shape.x = context.width() / 2;
                         shape.y = context.height() / 2;
@@ -56,8 +55,6 @@
                         context.stage.addChild(shape);
                         context.vars.shapes.push(shape);
                     }
-
-                    console.log(context.vars.shapes.length);
 
                     var fontStyle = '24px Arial';
                     var fontColor = '#458B00';
@@ -101,16 +98,16 @@
                             shape.y = context.height() - shape.height - 1;
                             if (shape.dy > 0) shape.dy *= -1;
                         }
+                    }
 
-                        var fps = context.vars.fps;
-                        fps.curr.text = 'FPS: ' + context._vars.fps.curr;
-                        if (context._vars.fps.track) {
-                            fps.min.text = 'MIN: ' + context._vars.fps.min;
-                            fps.max.text = 'MAX: ' + context._vars.fps.max;
-                        } else {
-                            fps.min.text = 'MIN: N/A';
-                            fps.max.text = 'MAX: N/A';
-                        }
+                    var fps = context.vars.fps;
+                    fps.curr.text = 'FPS: ' + context._vars.fps.curr;
+                    if (context._vars.fps.track) {
+                        fps.min.text = 'MIN: ' + context._vars.fps.min;
+                        fps.max.text = 'MAX: ' + context._vars.fps.max;
+                    } else {
+                        fps.min.text = 'MIN: N/A';
+                        fps.max.text = 'MAX: N/A';
                     }
                 }
                 irysius.createJsCanvas.init('main-canvas');

@@ -83,7 +83,7 @@ irysius.createJsCanvas = {
             track: false
         }
     },
-    vars: {},
+    vars: { },
     update: function (context, elapsedTime) { },
     _update: function () {
         var self = irysius.createJsCanvas;
@@ -104,10 +104,8 @@ irysius.createJsCanvas = {
         }
         self.update(self, elapsedTime);
     },
-    draw: function () { },
     _draw: function () {
         var self = irysius.createJsCanvas;
-        self.draw();
         self.stage.update();
     },
     stop: function () {
