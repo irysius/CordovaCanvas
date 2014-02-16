@@ -12,7 +12,7 @@ irysius.input = {
 
 irysius.input.keyboard = {
     initialized: false,
-    initialize: function () {
+    init: function () {
         var self = irysius.input.keyboard;
         document.onkeydown = self.handleKeyDown;
         document.onkeyup = self.handleKeyUp;
@@ -160,7 +160,7 @@ irysius.input.keyboard = {
 irysius.input.mouse = {
     initialized: false,
     // stage = createjs stage
-    initialize: function (stage) {
+    init: function (stage) {
         var self = irysius.input.mouse;
         // revisit - why do i have to attach this to the stage anyways
         stage.addEventListener('stagemousedown', self.handleMouseDown);
@@ -307,7 +307,7 @@ irysius.input.gamepad = {
         var self = irysius.input.gamepad;
         return self.gamepads.length > 0 && self.enabled;
     },
-    initialize: function () {
+    init: function () {
         var self = irysius.input.gamepad;
         self.available = !!navigator.webkitGetGamepads || !!navigator.webkitGamepads;
         self.initialized = true;

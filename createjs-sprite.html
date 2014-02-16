@@ -22,13 +22,13 @@
             }
 
             $(function () {
-                irysius.input.keyboard.initialize();
-                irysius.input.gamepad.initialize();
-                //irysius.input.mouse.initialize(irysius.createJsCanvas.stage);
+                irysius.input.keyboard.init();
+                irysius.input.gamepad.init();
+                //irysius.input.mouse.init(irysius.createJsCanvas.stage);
                 irysius.createJsCanvas.manifest.push({ id: 'palette', src: 'img/palette.png' });
 
                 irysius.createJsCanvas.prepareAssets = function (context) {
-                    irysius.input.mouse.initialize(context.stage);
+                    irysius.input.mouse.init(context.stage);
                     context.vars.shapes = [];
                     context.vars.fps = {
                         curr: null,
@@ -87,7 +87,7 @@
                     var keyboard = irysius.input.keyboard.state;
                     var mouse = irysius.input.mouse.state;
                     var gamepad = irysius.input.gamepad.state;
-                    console.log(mouse.curr.X + ',' + mouse.curr.Y);
+
                     if (mouse.click.LMB) {
                         $('body').css('background-color', 'red');
                         console.log(mouse.click.X + ',' + mouse.click.Y);
