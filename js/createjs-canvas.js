@@ -4,7 +4,7 @@ irysius.createJsCanvas = {
     initialized: false,
     stage: null,
     canvas: null,
-    container: null,
+    $container: null,
     preload: null,
     manifest: [],
     _width: 0,
@@ -25,12 +25,13 @@ irysius.createJsCanvas = {
     init: function (canvasId) {
         var self = irysius.createJsCanvas;
         self.canvas = document.getElementById(canvasId);
-        self.container = $(self.canvas).parent();
+        self.$container = $($(self.canvas).parent());
         $(window).resize(function () {
             self._resizing();
         });
 
         self.stage = new createjs.Stage(self.canvas);
+        //createjs.Touch.enable(self.stage);
         self.preload = new createjs.LoadQueue(true);
         self.preload.addEventListener('complete', self._prepareAssets);
 
@@ -52,8 +53,8 @@ irysius.createJsCanvas = {
     resizing: function (width, height) { },
     _resizing: function () {
         var self = irysius.createJsCanvas;
-        var width = $(self.container).width();
-        var height = $(self.container).height();
+        var width = self.$container.width();
+        var height = self.$container.height();
         self.canvas.width = width;
         self.canvas.height = height;
         self._width = width;
@@ -81,9 +82,18 @@ irysius.createJsCanvas = {
             max: 0,
             min: 1000,
             track: false
+        },
+        reset: function () {
+            var self = irysius.createJsCanvas;
+            self._vars.prevTime = 0;
+            self._vars.fps.target = 40;
+            self._vars.fps.curr = 0;
+            self._vars.fps.max = 0;
+            self._vars.fps.min = 1000;
+            self._vars.fps.track = false;
         }
     },
-    vars: { },
+    vars: {},
     update: function (context, elapsedTime) { },
     _update: function () {
         var self = irysius.createJsCanvas;

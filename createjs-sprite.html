@@ -11,6 +11,7 @@
         <script src="js/lib/createjs-2013.09.25.min.js"></script>
         <script src="js/lib/jquery-1.10.2.min.js"></script>
         <script src="js/createjs-canvas.js"></script>
+        <script src="js/input.js"></script>
     </head>
     <body>
         <canvas id="main-canvas"></canvas>
@@ -21,9 +22,13 @@
             }
 
             $(function () {
+                irysius.input.keyboard.initialize();
+                irysius.input.gamepad.initialize();
+                //irysius.input.mouse.initialize(irysius.createJsCanvas.stage);
                 irysius.createJsCanvas.manifest.push({ id: 'palette', src: 'img/palette.png' });
 
                 irysius.createJsCanvas.prepareAssets = function (context) {
+                    irysius.input.mouse.initialize(context.stage);
                     context.vars.shapes = [];
                     context.vars.fps = {
                         curr: null,
@@ -78,6 +83,23 @@
                     context.vars.fps.min = fpsMin;
                 }
                 irysius.createJsCanvas.update = function (context, elapsedTime) {
+                    irysius.input.tick();
+                    var keyboard = irysius.input.keyboard.state;
+                    var mouse = irysius.input.mouse.state;
+                    var gamepad = irysius.input.gamepad.state;
+                    console.log(mouse.curr.X + ',' + mouse.curr.Y);
+                    if (mouse.click.LMB) {
+                        $('body').css('background-color', 'red');
+                        console.log(mouse.click.X + ',' + mouse.click.Y);
+                    }
+                    if (keyboard.click.KEY_DOWN) $('body').css('background-color', 'yellow');
+                    if (keyboard.click.KEY_LEFT) $('body').css('background-color', 'green');
+                    if (keyboard.click.KEY_RIGHT) $('body').css('background-color', 'white');
+                    if (gamepad.click.BTN_X) $('body').css('background-color', 'purple');
+                    if (gamepad.click.SHOULDER_RIGHT) $('body').css('background-color', 'orange');
+                    if (gamepad.curr.STICK_LEFT_X < -0.5) $('body').css('background-color', 'black');
+                    if (gamepad.curr.STICK_LEFT_X > 0.5) $('body').css('background-color', 'blue');
+
                     for (idx in context.vars.shapes) {
                         var shape = context.vars.shapes[idx];
                         shape.x += shape.dx / 1000 * elapsedTime;
